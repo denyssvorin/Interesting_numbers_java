@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Interesting numbers</string>
+    <string name="edittext_hint"><font size="24">Number</font></string>
+</resources>
