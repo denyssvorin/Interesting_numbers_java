@@ -1,5 +1,6 @@
 package com.example.javaapplication.view;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -10,7 +11,6 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -20,12 +20,15 @@ import android.widget.Toast;
 import com.example.javaapplication.MainContract;
 import com.example.javaapplication.databinding.ActivityMainBinding;
 import com.example.javaapplication.model.Repository;
+import com.example.javaapplication.model.data.DataCallback;
 import com.example.javaapplication.model.data.NumberData;
 import com.example.javaapplication.presenter.MainPresenter;
 
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements MainContract.View, MainActivityAdapter.Listener {
+    private static final String KEY_NUMBER_VALUE = "KEY_NUMBER_VALUE";
+    private static final String KEY_FACT_VALUE = "KEY_FACT_VALUE";
     ActivityMainBinding binding;
     MainContract.Presenter mainPresenter;
     MainActivityAdapter numAdapter = new MainActivityAdapter(this);
@@ -35,6 +38,14 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(LayoutInflater.from(this));
         setContentView(binding.getRoot());
+
+        if (savedInstanceState != null) {
+            int number = savedInstanceState.getInt(KEY_NUMBER_VALUE);
+            String fact = savedInstanceState.getString(KEY_FACT_VALUE);
+            binding.editTextNumber.setText(String.valueOf(number));
+            binding.textViewFact.setText(fact);
+        }
+
         mainPresenter = new MainPresenter(this, new Repository(MainActivity.this));
 
         initRecyclerView();
@@ -72,7 +83,9 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                 if (!TextUtils.isEmpty(editTextNumber) || !editTextNumber.equals("")) {
                     String text = binding.editTextNumber.getText().toString();
                     int number = Integer.parseInt(text);
+
                     mainPresenter.getNumberData(number);
+
                 } else {
                     Toast.makeText( MainActivity.this, "Number field can not be empty", Toast.LENGTH_SHORT)
                             .show();
@@ -84,7 +97,6 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         binding.buttonGetRandomFact.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("TAG", "onClick: buttonGetRandomFact");
                 mainPresenter.getRandomNumberData();
             }
         });
@@ -125,6 +137,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         binding.editTextNumber.setText(Integer.toString(data.number));
         binding.textViewFact.setText(data.text);
         binding.editTextNumber.setCursorVisible(false);
+
         singleInsertInNumberList(data);
     }
 
@@ -132,6 +145,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     public void setNumberData(String data) {
         binding.textViewFact.setText(data);
         binding.editTextNumber.setCursorVisible(false);
+
         singleInsertInNumberList(new NumberData(Integer.
                 parseInt(binding.editTextNumber.getText().toString()), data));
     }
@@ -148,10 +162,36 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     }
     void getSavedNumberList() {
-        List<NumberData> numList = mainPresenter.getStoredData();
-        numAdapter.setNumberList(numList);
+        mainPresenter.getStoredData(new DataCallback() {
+            @Override
+            public void onDataLoaded(List<NumberData> numberDataList) {
+                numAdapter.setNumberList(numberDataList);
+            }
+        });
+
     }
     private void singleInsertInNumberList(NumberData numberData) {
         numAdapter.setSingleNumber(numberData);
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+
+        String editTextNumber = binding.editTextNumber.getText().toString();
+        String fact = binding.textViewFact.getText().toString();
+
+        if (!TextUtils.isEmpty(editTextNumber)) {
+            int number = Integer.parseInt(editTextNumber);
+
+            outState.putInt(KEY_NUMBER_VALUE, number);
+            outState.putString(KEY_FACT_VALUE, fact);
+        }
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mainPresenter.shutdownExecutorService();
     }
 }

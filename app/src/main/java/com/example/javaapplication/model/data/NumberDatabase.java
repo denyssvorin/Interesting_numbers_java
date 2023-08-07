@@ -16,7 +16,7 @@ public abstract class NumberDatabase extends RoomDatabase {
     public static NumberDatabase getDbInstance(Context context) {
         if (INSTANCE == null) {
             INSTANCE = Room.databaseBuilder(context.getApplicationContext(), NumberDatabase.class, "number_db")
-                    .allowMainThreadQueries()
+                    //.allowMainThreadQueries()
                     .build();
         }
         return INSTANCE;

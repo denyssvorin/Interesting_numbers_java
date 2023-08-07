@@ -3,6 +3,7 @@ package com.example.javaapplication.model;
 import androidx.lifecycle.LiveData;
 
 import com.example.javaapplication.MainContract;
+import com.example.javaapplication.model.data.DataCallback;
 import com.example.javaapplication.model.data.NumberData;
 
 import java.util.List;

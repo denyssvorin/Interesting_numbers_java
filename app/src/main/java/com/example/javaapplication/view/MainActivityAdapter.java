@@ -12,6 +12,9 @@ import com.example.javaapplication.R;
 import com.example.javaapplication.databinding.ItemNumBinding;
 import com.example.javaapplication.model.data.NumberData;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class MainActivityAdapter extends RecyclerView.Adapter<MainActivityAdapter.NumberViewHolder> {
@@ -31,6 +34,7 @@ public class MainActivityAdapter extends RecyclerView.Adapter<MainActivityAdapte
 
     public void setSingleNumber(NumberData numberData) {
         numberDataList.add(numberData);
+        Collections.sort(numberDataList);
         notifyDataSetChanged();
     }
 

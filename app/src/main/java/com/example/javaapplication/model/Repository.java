@@ -15,6 +15,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import kotlinx.coroutines.flow.Flow;
 import okhttp3.OkHttpClient;
@@ -112,6 +114,13 @@ public class Repository implements RepositoryActions {
     }
 
     private void saveData(int number, String text) {
-        db.numberDao().insertNumberData(new NumberData(number, text));
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                // background task
+                db.numberDao().insertNumberData(new NumberData(number, text));
+            }
+        });
     }
 }

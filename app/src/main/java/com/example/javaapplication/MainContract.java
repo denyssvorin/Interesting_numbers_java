@@ -1,5 +1,6 @@
 package com.example.javaapplication;
 
+import com.example.javaapplication.model.data.DataCallback;
 import com.example.javaapplication.model.data.NumberData;
 
 import java.util.List;
@@ -11,13 +12,13 @@ public interface MainContract {
 
         void getRandomNumberData();
 
-        List<NumberData> getStoredData();
+        void getStoredData(DataCallback callback);
 
         void onResultSuccess(NumberData data);
 
-        void onNumberResultSuccess(NumberData data);
-
         void onResultError(String error);
+
+        void shutdownExecutorService();
     }
 
     interface View {

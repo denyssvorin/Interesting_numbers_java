@@ -14,7 +14,7 @@ import kotlinx.parcelize.Parcelize;
 @Entity(tableName = "numbers_table")
 
 @Parcelize
-public final class NumberData implements Parcelable {
+public final class NumberData implements Parcelable, Comparable<NumberData> {
 
     public NumberData(){}
 
@@ -75,5 +75,10 @@ public final class NumberData implements Parcelable {
     public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeInt(number);
         dest.writeString(text);
+    }
+
+    @Override
+    public int compareTo(NumberData o) {
+        return this.number - o.number;
     }
 }
